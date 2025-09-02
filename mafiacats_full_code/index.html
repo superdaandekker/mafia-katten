@@ -1,62 +1,91 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MafiaCats</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#ff8fb2" />
+  <title>MafiaCats – Superschattig maffia-kattenspel</title>
+  <meta name="description" content="MafiaCats is een gratis, tekst-gebaseerd katten-maffiaspel. Klim van kittenspion naar Don Purrino en heers over de Miauwfia." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --bg:#fff6f8; --bg2:#ffeef4; --ink:#2e2a2c; --muted:#7d6b70;
+      --accent:#ff8fb2; --accent-600:#ff6f9c; --accent-700:#ff578c;
+      --mint:#b7f7d4; --lav:#cdb4f5; --card:#ffffff;
+    }
+    html{ scroll-behavior:smooth; }
+    body{ background:linear-gradient(180deg, var(--bg), var(--bg2)); color:var(--ink); font-family:'Outfit', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    .glass{ background:rgba(255,255,255,.9); backdrop-filter:blur(10px); box-shadow:0 6px 24px rgba(0,0,0,.09); }
+    .btn{ transition:transform .12s ease, box-shadow .2s ease, background-color .2s ease; font-weight:600; }
+    .btn:hover{ transform:translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,.12) }
+    .btn:focus-visible{ outline:3px solid rgba(255,143,178,.5); outline-offset:2px; }
+    .chip{ font-size:.75rem; padding:.25rem .6rem; border-radius:999px; background:#ffe0eb; color:#a43b64; border:1px solid #ffd0e1 }
+    .stat{ display:flex; justify-content:space-between; padding:.6rem .8rem; border-radius:.8rem; font-size:.92rem; }
+    .section{ position:relative; }
+    .section::after{ content:""; position:absolute; inset:auto 0 0 0; height:1px; background:linear-gradient(90deg, transparent, rgba(0,0,0,.08), transparent); }
+  </style>
 </head>
-<body class="bg-pink-50 font-sans leading-normal tracking-normal">
-
-  <!-- Hero sectie -->
-  <section class="bg-gradient-to-r from-pink-300 to-pink-500 text-white">
-    <div class="container mx-auto flex flex-col items-center py-20 px-4">
-      <h1 class="text-5xl font-extrabold mb-6">🐾 MafiaCats</h1>
-      <p class="text-xl mb-8 text-center max-w-2xl">
-        Welkom bij MafiaCats, het superschattige maar stoere maffiaspel vol kattenkwaad!
-      </p>
-      <a href="Game.html" class="bg-white text-pink-600 font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-100 transition">
-        Speel nu
+<body>
+  <!-- Header / Nav -->
+  <header class="w-full sticky top-0 z-50 border-b border-black/5 bg-white/70 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="#home" class="flex items-center gap-2">
+        <span aria-hidden>🐾</span>
+        <span class="font-extrabold tracking-tight text-xl">Mafia<span class="text-[var(--accent)]">Cats</span></span>
       </a>
-    </div>
-  </section>
-
-  <!-- Features sectie -->
-  <section class="container mx-auto py-16 px-4">
-    <h2 class="text-3xl font-bold text-center text-pink-600 mb-12">Waarom MafiaCats?</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="bg-white rounded-lg shadow p-6 text-center">
-        <h3 class="text-xl font-semibold mb-2">😼 Misdaden plegen</h3>
-        <p>Pleit zakkenrollerij, rooftochten of een overval en klim op in rang.</p>
-      </div>
-      <div class="bg-white rounded-lg shadow p-6 text-center">
-        <h3 class="text-xl font-semibold mb-2">🐾 Verzamel spullen</h3>
-        <p>Koop items in de kattenshop en gebruik ze om je slagingskansen te vergroten.</p>
-      </div>
-      <div class="bg-white rounded-lg shadow p-6 text-center">
-        <h3 class="text-xl font-semibold mb-2">🏆 Klim in rang</h3>
-        <p>Verdien purr-points en bereik de ultieme titel: Don Purrino.</p>
+      <nav class="hidden md:flex items-center gap-6 text-sm text-black/70" aria-label="Hoofdmenu">
+        <a href="#home" class="hover:text-black">Home</a>
+        <a href="#features" class="hover:text-black">Speluitleg</a>
+        <a href="#aanmelden" class="hover:text-black">Aanmelden</a>
+        <a href="Game.html" class="hover:text-black font-semibold">Speel nu</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="Game.html" class="btn px-4 py-2 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-600)] text-white">Speel nu</a>
+        <button id="navToggle" class="md:hidden p-2 rounded-lg hover:bg-black/5" aria-label="Menu openen">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
       </div>
     </div>
-  </section>
-
-  <!-- Call to action -->
-  <section class="bg-pink-100 py-16">
-    <div class="container mx-auto text-center">
-      <h2 class="text-3xl font-bold mb-6">Ben jij klaar om de straten te veroveren?</h2>
-      <a href="Game.html" class="bg-pink-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-pink-700 transition">
-        Speel nu
-      </a>
+    <!-- Mobile menu -->
+    <div id="mobileNav" class="md:hidden hidden border-t border-black/5 bg-white/95">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-2 text-sm">
+        <a href="#home" class="py-2">Home</a>
+        <a href="#features" class="py-2">Speluitleg</a>
+        <a href="#aanmelden" class="py-2">Aanmelden</a>
+        <a href="Game.html" class="py-2 font-semibold">Speel nu</a>
+      </div>
     </div>
-  </section>
+  </header>
 
-  <!-- Footer -->
-  <footer class="bg-pink-600 text-white py-6">
-    <div class="container mx-auto text-center">
-      <p>&copy; 2025 MafiaCats. Alle rechten voorbehouden.</p>
-      <a href="Game.html" class="underline">Speel nu</a>
-    </div>
-  </footer>
-
-</body>
-</html>
+  <!-- Hero -->
+  <section id="home" class="section relative py-16">
+    <div class="max-w-6xl mx-auto px-4 grid lg:grid-cols-2 gap-10 items-center">
+      <div>
+        <div class="flex items-center gap-2 mb-3"><span class="chip">Schattig</span><span class="chip">Maffia-strategie</span><span class="chip">Klik-acties</span></div>
+        <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight">Word de Don van de <span class="text-[var(--accent)]">kattenmaffia</span> 😺</h1>
+        <p class="mt-4 text-lg text-black/70 max-w-xl">Begin als <span class="text-[var(--accent)]">kittenspion</span> en klim op tot <b>Don Purrino</b>. Steel visjes 🐟, ontwijk honden 🐶 en verzamel Purr-points ✨ — direct in je browser.</p>
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+          <a href="Game.html" class="btn inline-flex items-center px-5 py-3 rounded-2xl bg-[var(--accent)] hover:bg-[var(--accent-600)] text-white">Speel nu</a>
+          <button id="speelNu" class="btn inline-flex items-center px-5 py-3 rounded-2xl bg-[var(--mint)] hover:bg-[var(--lav)]">Speel demo 🐾</button>
+        </div>
+        <div class="mt-8 grid grid-cols-3 gap-3 text-center">
+          <div class="glass rounded-2xl p-4">
+            <div class="text-2xl font-extrabold" id="leden">12.345</div>
+            <div class="text-xs text-black/60">Katten in de stad</div>
+          </div>
+          <div class="glass rounded-2xl p-4">
+            <div class="text-2xl font-extrabold" id="online">99</div>
+            <div class="text-xs text-black/60">Nu aan het miauwen</div>
+          </div>
+          <div class="glass rounded-2xl p-4">
+            <div class="text-2xl font-extrabold">9+ levens</div>
+            <div class="text-xs text-black/60">Geen smoesjes</div>
+          </div>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="rounded-3xl overflow-hidden border border-black/10 shadow-2xl">
+          <img src="https://images.unsplash.com/photo-157415862
