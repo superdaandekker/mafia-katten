@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#ff8fb2" />
-  <title>MafiaCats – Game (Middenpaneel weergaven)</title>
+  <title>MafiaCats – Game (Categorieën layout)</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -39,9 +39,10 @@
 
   <!-- Layout -->
   <main class="flex-1 max-w-7xl mx-auto w-full p-3 md:p-4 grid lg:grid-cols-[320px_1fr_320px] gap-3 md:gap-4 overflow-hidden" style="height:calc(100vh - 56px)">
-    <!-- Left: Character + Actieknoppen -->
+    <!-- Left: Profiel + Categorieën -->
     <aside class="flex flex-col gap-3 md:gap-4 overflow-hidden">
-      <div class="panel p-4 sticky top-3">
+      <!-- Profiel -->
+      <section class="panel p-4 sticky top-3">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-full bg-pink-200 flex items-center justify-center text-2xl">🐱</div>
           <div class="grow">
@@ -64,36 +65,51 @@
             <button id="restBtn" class="btn px-3 py-2 rounded-lg bg-black/5 hover:bg-black/10">Rust</button>
           </div>
 
-          <!-- Actieknoppen die middenpaneel openen -->
-          <div class="mt-3 grid grid-cols-1 gap-2">
-            <button id="openHeists" class="btn w-full px-4 py-3 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-600)] text-white">Overvallen</button>
+          <!-- Hier stond Overvallen: nu Inventaris op deze plek -->
+          <div class="mt-3">
+            <button id="openInv" class="btn w-full px-4 py-3 rounded-xl bg-black/5 hover:bg-black/10">
+              Inventaris
+            </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Werk blijft in de linkerkolom -->
-      <section class="panel p-3 md:p-4 overflow-auto">
-        <h2 class="font-semibold mb-2">Werk</h2>
-        <ul class="space-y-2 text-sm" id="workList"></ul>
+      <!-- Misdaden -->
+      <section class="panel p-4">
+        <h2 class="font-semibold mb-2">Misdaden</h2>
+        <div class="grid grid-cols-1 gap-2">
+          <button id="openHeists" class="btn w-full px-4 py-3 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-600)] text-white">
+            Overvallen
+          </button>
+        </div>
+      </section>
+
+      <!-- Algemeen -->
+      <section class="panel p-4">
+        <h2 class="font-semibold mb-2">Algemeen</h2>
+        <div class="grid grid-cols-1 gap-2">
+          <button id="openWork" class="btn w-full px-4 py-3 rounded-xl bg-black/5 hover:bg-black/10">Werk</button>
+          <button id="openShop" class="btn w-full px-4 py-3 rounded-xl bg-black/5 hover:bg-black/10">Kattenshop</button>
+        </div>
       </section>
     </aside>
 
-    <!-- Middle: wisselende weergave -->
+    <!-- Middle: views wisselen -->
     <section id="centerPanel" class="panel p-3 md:p-4 overflow-auto">
       <div class="flex items-center justify-between mb-2">
         <h2 id="centerTitle" class="text-lg font-extrabold">Stad & Logboek</h2>
-        <div class="text-xs"><span id="centerTag" class="tag">v0.3</span></div>
+        <div class="text-xs"><span id="centerTag" class="tag">v0.4</span></div>
       </div>
 
-      <!-- feedbackbalk -->
-      <div id="centerResult" class="hidden mb-3 p-3 rounded-xl border"></div>
+      <!-- feedback -->
+      <div id="centerResult" class="hidden mb-3 p-3 rounded-xl border text-sm"></div>
 
-      <!-- log -->
+      <!-- LOG -->
       <div id="logView">
         <div id="log" class="space-y-1 text-sm"></div>
       </div>
 
-      <!-- overvallen -->
+      <!-- HEISTS -->
       <div id="heistsView" class="hidden">
         <p class="text-sm text-black/70 mb-3">
           Begin bovenaan bij de makkelijke doelen. Elke poging geeft <b>XP</b> — meer XP = hogere <b>slagingskans</b>.
@@ -105,18 +121,25 @@
         </div>
       </div>
 
-      <!-- shop -->
+      <!-- WORK -->
+      <div id="workView" class="hidden">
+        <p class="text-sm text-black/70 mb-3">Verdien blikvoer en een beetje purr door klusjes te doen.</p>
+        <ul id="workListCenter" class="space-y-2 text-sm"></ul>
+        <div class="mt-4">
+          <button data-nav="log" class="btn px-4 py-2 rounded-lg bg-black/5 hover:bg-black/10">← Terug naar Logboek</button>
+        </div>
+      </div>
+
+      <!-- SHOP -->
       <div id="shopView" class="hidden">
-        <p class="text-sm text-black/70 mb-3">
-          Besteed je <b>blikvoer</b> aan items. De <i>laserpen</i> verhoogt je slagingskans bij overvallen.
-        </p>
+        <p class="text-sm text-black/70 mb-3">Besteed je <b>blikvoer</b> aan items. De <i>laserpen</i> verhoogt je slagingskans.</p>
         <ul id="shopListCenter" class="text-sm space-y-2"></ul>
         <div class="mt-4">
           <button data-nav="log" class="btn px-4 py-2 rounded-lg bg-black/5 hover:bg-black/10">← Terug naar Logboek</button>
         </div>
       </div>
 
-      <!-- inventaris -->
+      <!-- INVENTARIS -->
       <div id="invView" class="hidden">
         <p class="text-sm text-black/70 mb-3">Gebruik items voor herstel of voordeel. Sommige zijn verbruiksitems.</p>
         <ul id="invListCenter" class="text-sm space-y-2"></ul>
@@ -126,21 +149,22 @@
       </div>
     </section>
 
-    <!-- Right: knoppen die middenpaneel openen -->
+    <!-- Right: vrij voor toekomst (clan, tips, etc.) -->
     <aside class="flex flex-col gap-3 md:gap-4 overflow-hidden">
-      <section class="panel p-4 sticky top-3">
-        <h3 class="font-semibold mb-2">Snelkoppelingen</h3>
-        <div class="grid grid-cols-1 gap-2">
-          <button id="openShop" class="btn w-full px-4 py-2 rounded-lg bg-black/5 hover:bg-black/10">Kattenshop</button>
-          <button id="openInv" class="btn w-full px-4 py-2 rounded-lg bg-black/5 hover:bg-black/10">Inventaris</button>
-        </div>
+      <section class="panel p-4">
+        <h3 class="font-semibold mb-1">Tips</h3>
+        <ul class="text-sm space-y-1 text-black/70">
+          <li>💡 Lager doelwit = hogere kans. Verzamel XP!</li>
+          <li>🔦 Laserpen geeft +3% kans per stuk.</li>
+          <li>💤 Rust voor energie, halsband verlaagt alert.</li>
+        </ul>
       </section>
     </aside>
   </main>
 
   <script>
     const $=(s,r=document)=>r.querySelector(s); const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
-    const SAVE_KEY='mafiacats_save_v3';
+    const SAVE_KEY='mafiacats_save_v4';
     const state=load()||{name:'',cash:10,hp:9,en:100,rep:0,heat:0,day:1,items:{kruid:0,laser:0,muis:0,halsband:0},xp:{heist:{},work:{}},seed:Math.floor(Math.random()*1e9)};
 
     const HEISTS=[
@@ -162,32 +186,26 @@
 
     function save(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); toast('💾 Opgeslagen'); }
     function load(){ try{ const raw=localStorage.getItem(SAVE_KEY); return raw?JSON.parse(raw):null }catch{return null} }
-    function reset(){ localStorage.removeItem(SAVE_KEY); Object.assign(state,{name:'',cash:10,hp:9,en:100,rep:0,heat:0,day:1,items:{kruid:0,laser:0,muis:0,halsband:0},xp:{heist:{},work:{}},seed:Math.floor(Math.random()*1e9)}); update(); log('🔄 Reset voltooid.'); }
+    function reset(){ localStorage.removeItem(SAVE_KEY); Object.assign(state,{name:'',cash:10,hp:9,en:100,rep:0,heat:0,day:1,items:{kruid:0,laser:0,muis:0,halsband:0},xp:{heist:{},work:{}},seed:Math.floor(Math.random()*1e9)}); update(); showView('log'); log('🔄 Reset voltooid.'); }
 
     // ---------- UI state ----------
     function showView(kind){
-      // verberg alles
-      $('#logView').classList.add('hidden');
-      $('#heistsView').classList.add('hidden');
-      $('#shopView').classList.add('hidden');
-      $('#invView').classList.add('hidden');
+      // verberg
+      ['logView','heistsView','workView','shopView','invView'].forEach(id=>$('#'+id).classList.add('hidden'));
       $('#centerResult').classList.add('hidden');
-
-      // toon gekozen
+      // toon
       if(kind==='log'){ $('#centerTitle').textContent='Stad & Logboek'; $('#logView').classList.remove('hidden'); }
       if(kind==='heists'){ $('#centerTitle').textContent='Overvallen'; $('#heistsView').classList.remove('hidden'); renderHeists('heistListCenter'); }
+      if(kind==='work'){ $('#centerTitle').textContent='Werk'; $('#workView').classList.remove('hidden'); renderWorkCenter(); }
       if(kind==='shop'){ $('#centerTitle').textContent='Kattenshop'; $('#shopView').classList.remove('hidden'); renderShop(); }
       if(kind==='inv'){ $('#centerTitle').textContent='Inventaris'; $('#invView').classList.remove('hidden'); renderInvCenter(); }
     }
-
     function showResult(msg, type='info'){
-      const el = $('#centerResult');
-      el.textContent = msg;
-      el.classList.remove('hidden');
+      const el=$('#centerResult'); el.textContent=msg; el.classList.remove('hidden');
       el.className='mb-3 p-3 rounded-xl border text-sm';
       if(type==='ok'){ el.classList.add('bg-green-50','border-green-200','text-green-800'); }
       else if(type==='err'){ el.classList.add('bg-red-50','border-red-200','text-red-800'); }
-      else { el.classList.add('bg-pink-50','border-pink-200','text-pink-900'); }
+      else{ el.classList.add('bg-pink-50','border-pink-200','text-pink-900'); }
     }
 
     // ---------- stats helpers ----------
@@ -197,7 +215,7 @@
       $('#hudCash').textContent=state.cash; $('#hudHP').textContent=state.hp; $('#hudEN').textContent=state.en+'%'; $('#hudHeat').textContent=state.heat+'%'; $('#hudRep').textContent=state.rep;
       $('#charName').value=state.name||'';
     }
-    function update(){ updateHUD(); renderWork(); }
+    function update(){ updateHUD(); }
 
     function rank(){ const R=[{n:'Kittenspion',r:0},{n:'Straatkat',r:30},{n:'Klapkat',r:80},{n:'Miauwster',r:150},{n:'Katerbaas',r:250},{n:'Oude wijze poes',r:400},{n:'Don Purrino',r:700}]; let cur=R[0].n; for(const r of R){ if(state.rep>=r.r) cur=r.n; else break;} return cur; }
 
@@ -210,32 +228,31 @@
     // ---------- Heists ----------
     function heistChance(h){
       const xp = (state.xp.heist[h.key]||0);
-      let chance = h.base + (xp*0.005) + (state.items.laser*0.03); // +0,5% per XP, +3% per laser
+      let chance = h.base + (xp*0.005) + (state.items.laser*0.03);
       return Math.min(chance, 0.9);
     }
     function doHeist(key){
-      const h = HEISTS.find(x=>x.key===key); if(!h) return;
+      const h=HEISTS.find(x=>x.key===key); if(!h) return;
       if(!spend(h.cost)) return;
-      const chance = heistChance(h);
-      const roll = rng();
-      if(roll < chance){
-        const gain = h.payout[0] + Math.floor(rng() * (h.payout[1]-h.payout[0]+1));
+      const chance=heistChance(h), roll=rng();
+      if(roll<chance){
+        const gain = h.payout[0]+Math.floor(rng()*(h.payout[1]-h.payout[0]+1));
         addCash(gain); addRep(h.rep); addHeat(h.heatS); state.xp.heist[key]=(state.xp.heist[key]||0)+3;
         showResult(`✅ Succes: ${h.name}. +${gain} blikvoer, +${h.rep} purr, +alert.`,'ok');
         log(`✅ ${h.emoji} Succes: ${h.name}. +${gain} blikvoer, +${h.rep} purr, +alert.`);
-      } else {
+      }else{
         addHP(-h.hpF); addHeat(h.heatF); state.xp.heist[key]=(state.xp.heist[key]||0)+1;
         showResult(`❌ Mislukt: ${h.name}. −${h.hpF} leven, +alert.`,'err');
         log(`❌ ${h.emoji} Mislukt: ${h.name}. −${h.hpF} leven, +alert.`);
       }
-      update(); check(); renderHeists('heistListCenter');
+      updateHUD(); check(); renderHeists('heistListCenter');
     }
     function renderHeists(ulId){
       const ul=document.getElementById(ulId); ul.innerHTML='';
       HEISTS.forEach(h=>{
-        const xp = state.xp.heist[h.key]||0; const ch=heistChance(h);
+        const xp=state.xp.heist[h.key]||0, ch=heistChance(h);
         const li=document.createElement('li'); li.className='flex items-center gap-3 bg-pink-50 rounded-xl px-3 py-2 border border-pink-100';
-        li.innerHTML = `
+        li.innerHTML=`
           <div class="text-xl">${h.emoji}</div>
           <div class="grow min-w-0">
             <div class="flex items-center justify-between gap-2">
@@ -243,55 +260,56 @@
               <span class="text-xs">Kans: <b>${pct(ch)}%</b></span>
             </div>
             <p class="text-xs text-black/60">Energie ${h.cost} · Buit ${h.payout[0]}–${h.payout[1]} · Purr +${h.rep}</p>
-            <div class="xbar mt-1"><i style="width:${Math.min(100, xp)}%"></i></div>
+            <div class="xbar mt-1"><i style="width:${Math.min(100,xp)}%"></i></div>
           </div>
-          <button class="btn px-3 py-1.5 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-600)] text-white whitespace-nowrap" data-heist="${h.key}">Doe overval</button>
+          <button class="btn px-3 py-1.5 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-600)] text-white" data-heist="${h.key}">Doe overval</button>
         `;
         ul.appendChild(li);
       });
-      $$('[data-heist]', ul).forEach(b=> b.addEventListener('click', ()=> doHeist(b.getAttribute('data-heist'))));
+      $$('[data-heist]',ul).forEach(b=>b.addEventListener('click',()=>doHeist(b.getAttribute('data-heist'))));
     }
 
     // ---------- Werk ----------
     function doWork(key){
-      const w = WORK.find(x=>x.key===key); if(!w) return;
+      const w=WORK.find(x=>x.key===key); if(!w) return;
       if(!spend(w.cost)) return;
-      const base = w.payout[0]; const extra = Math.floor(rng()*(w.payout[1]-w.payout[0]+1));
-      const xp = (state.xp.work[w.key]||0);
-      const bonus = Math.floor(xp*0.05);
+      const base=w.payout[0], extra=Math.floor(rng()*(w.payout[1]-w.payout[0]+1));
+      const xp=state.xp.work[w.key]||0, bonus=Math.floor(xp*0.05);
       addCash(base+extra+bonus); addRep(w.rep); if(w.heat) addHeat(w.heat);
       state.xp.work[w.key]=(state.xp.work[w.key]||0)+2;
-      log(`${w.emoji} Werk: ${w.name}. +${base+extra+bonus} blikvoer${w.heat? ", +alert":""}.`);
-      update();
+      showResult(`${w.emoji} Werk gedaan: ${w.name}. +${base+extra+bonus} blikvoer${w.heat?', +alert':''}.`,'ok');
+      log(`${w.emoji} Werk: ${w.name}. +${base+extra+bonus} blikvoer${w.heat?', +alert':''}.`);
+      updateHUD(); renderWorkCenter();
     }
-    function renderWork(){
-      const ul=$('#workList'); ul.innerHTML='';
+    function renderWorkCenter(){
+      const ul=$('#workListCenter'); ul.innerHTML='';
       WORK.forEach(w=>{
-        const xp = state.xp.work[w.key]||0;
+        const xp=state.xp.work[w.key]||0;
         const li=document.createElement('li'); li.className='flex items-center gap-3 bg-white rounded-xl px-3 py-2 border border-pink-100';
-        li.innerHTML = `
+        li.innerHTML=`
           <div class="text-xl">${w.emoji}</div>
           <div class="grow min-w-0">
             <div class="flex items-center justify-between gap-2">
               <p class="font-semibold truncate">${w.name}</p>
               <span class="text-xs">Energie ${w.cost}</span>
             </div>
-            <p class="text-xs text-black/60">Beloning ${w.payout[0]}–${w.payout[1]} · Purr +${w.rep}${w.heat? ' · +alert':''}</p>
-            <div class="xbar mt-1"><i style="width:${Math.min(100, xp)}%"></i></div>
+            <p class="text-xs text-black/60">Beloning ${w.payout[0]}–${w.payout[1]} · Purr +${w.rep}${w.heat?' · +alert':''}</p>
+            <div class="xbar mt-1"><i style="width:${Math.min(100,xp)}%"></i></div>
           </div>
-          <button class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10 whitespace-nowrap" data-work="${w.key}">Aan de slag</button>`;
+          <button class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10" data-work="${w.key}">Aan de slag</button>
+        `;
         ul.appendChild(li);
       });
-      $$('[data-work]', ul).forEach(b=> b.addEventListener('click', ()=> doWork(b.getAttribute('data-work'))));
+      $$('[data-work]',ul).forEach(b=>b.addEventListener('click',()=>doWork(b.getAttribute('data-work'))));
     }
 
-    // ---------- Shop & Inventaris (middenpaneel) ----------
+    // ---------- Shop & Inventaris (center) ----------
     function renderShop(){
       const prices={kruid:3,laser:5,muis:6,halsband:8};
       const items=[
         {k:'kruid', label:'🌿 Kattenkruid (+12 energie)'},
         {k:'laser', label:'🔦 Laserpen (+3% overval)'},
-        {k:'muis', label:'🧸 Pluche muis (+1 leven)'},
+        {k:'muis',  label:'🧸 Pluche muis (+1 leven)'},
         {k:'halsband', label:'💍 Halsband (−15% alert)'},
       ];
       const ul=$('#shopListCenter'); ul.innerHTML='';
@@ -305,15 +323,14 @@
           </div>`;
         ul.appendChild(li);
       });
-      $$('[data-buy]', ul).forEach(b=> b.addEventListener('click', ()=> buy(b.getAttribute('data-buy'))));
+      $$('[data-buy]',ul).forEach(b=>b.addEventListener('click',()=>buy(b.getAttribute('data-buy'))));
     }
-
     function renderInvCenter(){
       const names={kruid:'🌿 Kattenkruid',laser:'🔦 Laserpen',muis:'🧸 Pluche muis',halsband:'💍 Halsband'};
       const ul=$('#invListCenter'); ul.innerHTML='';
       Object.keys(state.items).forEach(k=>{
-        const li=document.createElement('li'); li.className='flex items-center justify-between bg-white rounded-xl px-3 py-2 border border-pink-100';
         const count=state.items[k];
+        const li=document.createElement('li'); li.className='flex items-center justify-between bg-white rounded-xl px-3 py-2 border border-pink-100';
         li.innerHTML=`
           <span>${names[k]} × ${count}</span>
           <div class="flex items-center gap-2">
@@ -323,29 +340,26 @@
           </div>`;
         ul.appendChild(li);
       });
-      $$('[data-use]', ul).forEach(b=> b.addEventListener('click', ()=> useItem(b.getAttribute('data-use'))));
+      $$('[data-use]',ul).forEach(b=>b.addEventListener('click',()=>useItem(b.getAttribute('data-use'))));
     }
-
     function buy(item){
       const prices={kruid:3,laser:5,muis:6,halsband:8};
       if(state.cash<prices[item]){ showResult('Niet genoeg blikvoer.','err'); return; }
       addCash(-prices[item]); state.items[item]++; updateHUD();
       showResult(`🛍️ Gekocht: ${item}.`,'ok'); log(`🛍️ Gekocht: ${item}.`);
-      // refresh shop / inventory view indien zichtbaar
       if(!$('#shopView').classList.contains('hidden')) renderShop();
       if(!$('#invView').classList.contains('hidden')) renderInvCenter();
     }
-
     function useItem(item){
       if(state.items[item]<=0){ showResult('Je hebt dat item niet.','err'); return; }
-      if(item==='kruid'){ state.items.kruid--; state.en=clamp(state.en+12); showResult('🌿 Kattenkruid gebruikt: +12 energie.','ok'); log('🌿 Kattenkruid: +12 energie.'); }
+      if(item==='kruid'){ state.items.kruid--; state.en=clamp(state.en+12); showResult('🌿 Kattenkruid: +12 energie.','ok'); log('🌿 Kattenkruid: +12 energie.'); }
       else if(item==='muis'){ state.items.muis--; addHP(1); showResult('🧸 Pluche muis: +1 leven.','ok'); log('🧸 Pluche muis: +1 leven.'); }
       else if(item==='halsband'){ state.items.halsband--; addHeat(-15); showResult('💍 Halsband: −15% alert.','ok'); log('💍 Halsband: −15% alert.'); }
       updateHUD();
       if(!$('#invView').classList.contains('hidden')) renderInvCenter();
     }
 
-    // ---------- Log, meldingen, dag-cyclus ----------
+    // ---------- Log & dagcyclus ----------
     function log(t){ const d=document.createElement('div'); d.className='bg-white border border-pink-200/60 rounded px-3 py-2'; d.textContent=t; $('#log').prepend(d); }
     function check(){ if(state.hp<=0) showResult('🚑 Dierenambulance… GAME OVER.','err'); if(state.heat>=100) showResult('🚓 Te veel honden-alert! GAME OVER.','err'); }
     function toast(msg){ const t=document.createElement('div'); t.className='fixed bottom-4 left-1/2 -translate-x-1/2 bg-black/80 text-white px-3 py-2 rounded-xl text-sm'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),1400); }
@@ -362,11 +376,11 @@
 
     // ---------- Bindings ----------
     $('#openHeists').addEventListener('click', ()=> showView('heists'));
-    $('#openShop').addEventListener('click', ()=> showView('shop'));
-    $('#openInv').addEventListener('click',  ()=> showView('inv'));
+    $('#openWork').addEventListener('click',  ()=> showView('work'));
+    $('#openShop').addEventListener('click',  ()=> showView('shop'));
+    $('#openInv').addEventListener('click',   ()=> showView('inv'));
     $$('[data-nav="log"]').forEach(b=> b.addEventListener('click', ()=> showView('log')));
 
-    $$('[data-buy]').forEach(b=> b.addEventListener('click', ()=> buy(b.getAttribute('data-buy')))); // (failsafe als ooit knoppen buiten center staan)
     $('#nextDay').addEventListener('click', nextDay);
     $('#restBtn').addEventListener('click', rest);
     $('#saveBtn').addEventListener('click', save);
@@ -375,21 +389,11 @@
 
     // init
     function initialRender(){
-      update(); // HUD + werk
-      showView('log'); // start in log
-      if(!load()) log('Welkom! Gebruik de knoppen Overvallen / Kattenshop / Inventaris om het middenpaneel te openen. 🐾');
+      update();
+      showView('log');
+      if(!load()) log('Welkom! Kies een categorie: Misdaden → Overvallen, Algemeen → Werk of Kattenshop, Inventaris onder je profiel. 🐾');
     }
-    function updateAllHUDMirrors(){
-      $('#hudCash').textContent=state.cash; $('#hudHP').textContent=state.hp; $('#hudEN').textContent=state.en+'%'; $('#hudHeat').textContent=state.heat+'%'; $('#hudRep').textContent=state.rep;
-    }
-    function updateLocalStorage(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
     function load(){ try{ const raw=localStorage.getItem(SAVE_KEY); return raw?JSON.parse(raw):null }catch{return null} }
-    function save(){ updateLocalStorage(); toast('💾 Opgeslagen'); }
-    function reset(){
-      localStorage.removeItem(SAVE_KEY);
-      Object.assign(state,{name:'',cash:10,hp:9,en:100,rep:0,heat:0,day:1,items:{kruid:0,laser:0,muis:0,halsband:0},xp:{heist:{},work:{}},seed:Math.floor(Math.random()*1e9)});
-      update(); showView('log'); log('🔄 Reset voltooid.');
-    }
 
     initialRender();
   </script>
