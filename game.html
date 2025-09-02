@@ -17,7 +17,6 @@
     .bar>i{ display:block; height:100%; background:linear-gradient(90deg, var(--accent), var(--lav)); }
     .xbar{ height:6px; border-radius:999px; background:#f7e7ef; overflow:hidden }
     .xbar>i{ display:block; height:100%; background:linear-gradient(90deg, #ffc1d6, #cdb4f5); }
-    .pill{ font-size:.7rem; padding:.15rem .45rem; border-radius:999px; background:#fff1f6; border:1px solid #ffd6e5; color:#9b3b62; }
     .tag{ font-size:.72rem; padding:.25rem .55rem; border-radius:.7rem; background:#ffe3ef; border:1px solid #ffcfe2; color:#7d2a4b; }
   </style>
 </head>
@@ -27,11 +26,11 @@
     <a href="index.html" class="flex items-center gap-2 font-extrabold text-lg">🐾 Mafia<span class="text-pink-500">Cats</span></a>
     <div class="flex items-center gap-3 text-sm">
       <span class="hidden md:flex items-center gap-3">
-        <span>🥫 <b id="hudCash">10</b></span>
-        <span>💖 <b id="hudHP">9</b></span>
-        <span>💤 <b id="hudEN">100%</b></span>
-        <span>🐶 <b id="hudHeat">0%</b></span>
-        <span>✨ <b id="hudRep">0</b></span>
+        <span title="Blikvoer">🥫 <b id="hudCash">10</b></span>
+        <span title="Levens">💖 <b id="hudHP">9</b></span>
+        <span title="Energie">💤 <b id="hudEN">100%</b></span>
+        <span title="Honden-alert">🐶 <b id="hudHeat">0%</b></span>
+        <span title="Purr-points">✨ <b id="hudRep">0</b></span>
       </span>
       <button id="saveBtn" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Opslaan</button>
       <button id="resetBtn" class="btn px-3 py-1.5 rounded-lg bg-pink-200 hover:bg-pink-300">Reset</button>
@@ -109,7 +108,7 @@
       <!-- shop -->
       <div id="shopView" class="hidden">
         <p class="text-sm text-black/70 mb-3">
-          Besteed je <b>blikvoer</b> aan items. Sommige items (zoals de <i>laserpen</i>) verhogen je slagingskans bij overvallen.
+          Besteed je <b>blikvoer</b> aan items. De <i>laserpen</i> verhoogt je slagingskans bij overvallen.
         </p>
         <ul id="shopListCenter" class="text-sm space-y-2"></ul>
         <div class="mt-4">
@@ -127,7 +126,7 @@
       </div>
     </section>
 
-    <!-- Right: nu alleen knoppen die middenpaneel openen -->
+    <!-- Right: knoppen die middenpaneel openen -->
     <aside class="flex flex-col gap-3 md:gap-4 overflow-hidden">
       <section class="panel p-4 sticky top-3">
         <h3 class="font-semibold mb-2">Snelkoppelingen</h3>
@@ -181,6 +180,16 @@
       if(kind==='inv'){ $('#centerTitle').textContent='Inventaris'; $('#invView').classList.remove('hidden'); renderInvCenter(); }
     }
 
+    function showResult(msg, type='info'){
+      const el = $('#centerResult');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      el.className='mb-3 p-3 rounded-xl border text-sm';
+      if(type==='ok'){ el.classList.add('bg-green-50','border-green-200','text-green-800'); }
+      else if(type==='err'){ el.classList.add('bg-red-50','border-red-200','text-red-800'); }
+      else { el.classList.add('bg-pink-50','border-pink-200','text-pink-900'); }
+    }
+
     // ---------- stats helpers ----------
     function updateHUD(){
       $('#cash').textContent=state.cash; $('#hp').textContent=state.hp; $('#en').textContent=state.en+'%'; $('#heat').textContent=state.heat+'%'; $('#rep').textContent=state.rep;
@@ -192,7 +201,7 @@
 
     function rank(){ const R=[{n:'Kittenspion',r:0},{n:'Straatkat',r:30},{n:'Klapkat',r:80},{n:'Miauwster',r:150},{n:'Katerbaas',r:250},{n:'Oude wijze poes',r:400},{n:'Don Purrino',r:700}]; let cur=R[0].n; for(const r of R){ if(state.rep>=r.r) cur=r.n; else break;} return cur; }
 
-    function spend(c){ if(state.en<c){ toast('😴 Te moe om te miauwen.'); return false;} state.en=clamp(state.en-c); return true; }
+    function spend(c){ if(state.en<c){ showResult('😴 Te moe om te miauwen.','err'); return false;} state.en=clamp(state.en-c); return true; }
     function addCash(c){ state.cash=Math.max(0,state.cash+c); }
     function addHP(h){ state.hp=Math.max(0,state.hp+h); }
     function addRep(r){ state.rep=Math.max(0,state.rep+r); }
@@ -212,11 +221,11 @@
       if(roll < chance){
         const gain = h.payout[0] + Math.floor(rng() * (h.payout[1]-h.payout[0]+1));
         addCash(gain); addRep(h.rep); addHeat(h.heatS); state.xp.heist[key]=(state.xp.heist[key]||0)+3;
-        showResult(`✅ Succes: ${h.name}. +${gain} blikvoer, +${h.rep} purr, +alert.`);
+        showResult(`✅ Succes: ${h.name}. +${gain} blikvoer, +${h.rep} purr, +alert.`,'ok');
         log(`✅ ${h.emoji} Succes: ${h.name}. +${gain} blikvoer, +${h.rep} purr, +alert.`);
       } else {
         addHP(-h.hpF); addHeat(h.heatF); state.xp.heist[key]=(state.xp.heist[key]||0)+1;
-        showResult(`❌ Mislukt: ${h.name}. −${h.hpF} leven, +alert.`);
+        showResult(`❌ Mislukt: ${h.name}. −${h.hpF} leven, +alert.`,'err');
         log(`❌ ${h.emoji} Mislukt: ${h.name}. −${h.hpF} leven, +alert.`);
       }
       update(); check(); renderHeists('heistListCenter');
@@ -267,4 +276,122 @@
               <p class="font-semibold truncate">${w.name}</p>
               <span class="text-xs">Energie ${w.cost}</span>
             </div>
-            <p class="text-xs text-black/60">Beloning ${w.payout[0]}–
+            <p class="text-xs text-black/60">Beloning ${w.payout[0]}–${w.payout[1]} · Purr +${w.rep}${w.heat? ' · +alert':''}</p>
+            <div class="xbar mt-1"><i style="width:${Math.min(100, xp)}%"></i></div>
+          </div>
+          <button class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10 whitespace-nowrap" data-work="${w.key}">Aan de slag</button>`;
+        ul.appendChild(li);
+      });
+      $$('[data-work]', ul).forEach(b=> b.addEventListener('click', ()=> doWork(b.getAttribute('data-work'))));
+    }
+
+    // ---------- Shop & Inventaris (middenpaneel) ----------
+    function renderShop(){
+      const prices={kruid:3,laser:5,muis:6,halsband:8};
+      const items=[
+        {k:'kruid', label:'🌿 Kattenkruid (+12 energie)'},
+        {k:'laser', label:'🔦 Laserpen (+3% overval)'},
+        {k:'muis', label:'🧸 Pluche muis (+1 leven)'},
+        {k:'halsband', label:'💍 Halsband (−15% alert)'},
+      ];
+      const ul=$('#shopListCenter'); ul.innerHTML='';
+      items.forEach(it=>{
+        const li=document.createElement('li'); li.className='flex items-center justify-between bg-white rounded-xl px-3 py-2 border border-pink-100';
+        li.innerHTML=`
+          <span>${it.label}</span>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-black/60">Prijs ${prices[it.k]}</span>
+            <button data-buy="${it.k}" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop</button>
+          </div>`;
+        ul.appendChild(li);
+      });
+      $$('[data-buy]', ul).forEach(b=> b.addEventListener('click', ()=> buy(b.getAttribute('data-buy'))));
+    }
+
+    function renderInvCenter(){
+      const names={kruid:'🌿 Kattenkruid',laser:'🔦 Laserpen',muis:'🧸 Pluche muis',halsband:'💍 Halsband'};
+      const ul=$('#invListCenter'); ul.innerHTML='';
+      Object.keys(state.items).forEach(k=>{
+        const li=document.createElement('li'); li.className='flex items-center justify-between bg-white rounded-xl px-3 py-2 border border-pink-100';
+        const count=state.items[k];
+        li.innerHTML=`
+          <span>${names[k]} × ${count}</span>
+          <div class="flex items-center gap-2">
+            ${k!=='laser'
+              ? `<button data-use="${k}" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10"${count<=0?' disabled':''}>Gebruik</button>`
+              : `<span class="text-xs text-black/50">passief</span>`}
+          </div>`;
+        ul.appendChild(li);
+      });
+      $$('[data-use]', ul).forEach(b=> b.addEventListener('click', ()=> useItem(b.getAttribute('data-use'))));
+    }
+
+    function buy(item){
+      const prices={kruid:3,laser:5,muis:6,halsband:8};
+      if(state.cash<prices[item]){ showResult('Niet genoeg blikvoer.','err'); return; }
+      addCash(-prices[item]); state.items[item]++; updateHUD();
+      showResult(`🛍️ Gekocht: ${item}.`,'ok'); log(`🛍️ Gekocht: ${item}.`);
+      // refresh shop / inventory view indien zichtbaar
+      if(!$('#shopView').classList.contains('hidden')) renderShop();
+      if(!$('#invView').classList.contains('hidden')) renderInvCenter();
+    }
+
+    function useItem(item){
+      if(state.items[item]<=0){ showResult('Je hebt dat item niet.','err'); return; }
+      if(item==='kruid'){ state.items.kruid--; state.en=clamp(state.en+12); showResult('🌿 Kattenkruid gebruikt: +12 energie.','ok'); log('🌿 Kattenkruid: +12 energie.'); }
+      else if(item==='muis'){ state.items.muis--; addHP(1); showResult('🧸 Pluche muis: +1 leven.','ok'); log('🧸 Pluche muis: +1 leven.'); }
+      else if(item==='halsband'){ state.items.halsband--; addHeat(-15); showResult('💍 Halsband: −15% alert.','ok'); log('💍 Halsband: −15% alert.'); }
+      updateHUD();
+      if(!$('#invView').classList.contains('hidden')) renderInvCenter();
+    }
+
+    // ---------- Log, meldingen, dag-cyclus ----------
+    function log(t){ const d=document.createElement('div'); d.className='bg-white border border-pink-200/60 rounded px-3 py-2'; d.textContent=t; $('#log').prepend(d); }
+    function check(){ if(state.hp<=0) showResult('🚑 Dierenambulance… GAME OVER.','err'); if(state.heat>=100) showResult('🚓 Te veel honden-alert! GAME OVER.','err'); }
+    function toast(msg){ const t=document.createElement('div'); t.className='fixed bottom-4 left-1/2 -translate-x-1/2 bg-black/80 text-white px-3 py-2 rounded-xl text-sm'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),1400); }
+
+    function rest(){ state.en=clamp(state.en+12); state.heat=clamp(state.heat-3); showResult('🛌 Even rust: +12 energie, −3 alert.'); log('🛌 Rust genomen.'); updateHUD(); }
+    function nextDay(){
+      state.day++; state.en=clamp(state.en+25); state.heat=clamp(state.heat-5);
+      const r=rng();
+      if(r<.15){ const fine=2+Math.floor(rng()*6); addCash(-fine); addHeat(3); log(`🐕 Boete: −${fine} blikvoer (+alert)`);}
+      else if(r<.28){ const find=2+Math.floor(rng()*6); addCash(find); log(`🎁 Je vond ${find} blikvoer in een doos.`);}
+      else if(r<.34){ addHP(-1); log('🛁 Je viel in de badkuip. −1 leven.'); }
+      updateHUD(); check();
+    }
+
+    // ---------- Bindings ----------
+    $('#openHeists').addEventListener('click', ()=> showView('heists'));
+    $('#openShop').addEventListener('click', ()=> showView('shop'));
+    $('#openInv').addEventListener('click',  ()=> showView('inv'));
+    $$('[data-nav="log"]').forEach(b=> b.addEventListener('click', ()=> showView('log')));
+
+    $$('[data-buy]').forEach(b=> b.addEventListener('click', ()=> buy(b.getAttribute('data-buy')))); // (failsafe als ooit knoppen buiten center staan)
+    $('#nextDay').addEventListener('click', nextDay);
+    $('#restBtn').addEventListener('click', rest);
+    $('#saveBtn').addEventListener('click', save);
+    $('#resetBtn').addEventListener('click', reset);
+    $('#charName').addEventListener('input',e=>{ state.name=e.target.value; });
+
+    // init
+    function initialRender(){
+      update(); // HUD + werk
+      showView('log'); // start in log
+      if(!load()) log('Welkom! Gebruik de knoppen Overvallen / Kattenshop / Inventaris om het middenpaneel te openen. 🐾');
+    }
+    function updateAllHUDMirrors(){
+      $('#hudCash').textContent=state.cash; $('#hudHP').textContent=state.hp; $('#hudEN').textContent=state.en+'%'; $('#hudHeat').textContent=state.heat+'%'; $('#hudRep').textContent=state.rep;
+    }
+    function updateLocalStorage(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+    function load(){ try{ const raw=localStorage.getItem(SAVE_KEY); return raw?JSON.parse(raw):null }catch{return null} }
+    function save(){ updateLocalStorage(); toast('💾 Opgeslagen'); }
+    function reset(){
+      localStorage.removeItem(SAVE_KEY);
+      Object.assign(state,{name:'',cash:10,hp:9,en:100,rep:0,heat:0,day:1,items:{kruid:0,laser:0,muis:0,halsband:0},xp:{heist:{},work:{}},seed:Math.floor(Math.random()*1e9)});
+      update(); showView('log'); log('🔄 Reset voltooid.');
+    }
+
+    initialRender();
+  </script>
+</body>
+</html>
