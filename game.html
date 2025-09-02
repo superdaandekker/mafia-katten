@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#ff8fb2" />
-  <title>MafiaCats – Game (Overvallen in modal)</title>
+  <title>MafiaCats – Game (Middenpaneel weergaven)</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -18,6 +18,7 @@
     .xbar{ height:6px; border-radius:999px; background:#f7e7ef; overflow:hidden }
     .xbar>i{ display:block; height:100%; background:linear-gradient(90deg, #ffc1d6, #cdb4f5); }
     .pill{ font-size:.7rem; padding:.15rem .45rem; border-radius:999px; background:#fff1f6; border:1px solid #ffd6e5; color:#9b3b62; }
+    .tag{ font-size:.72rem; padding:.25rem .55rem; border-radius:.7rem; background:#ffe3ef; border:1px solid #ffcfe2; color:#7d2a4b; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -64,82 +65,79 @@
             <button id="restBtn" class="btn px-3 py-2 rounded-lg bg-black/5 hover:bg-black/10">Rust</button>
           </div>
 
-          <!-- Actie: Overvallen (opent modal) -->
-          <div class="mt-3">
-            <button id="openHeists" class="btn w-full px-4 py-3 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-600)] text-white">
-              Overvallen
-            </button>
+          <!-- Actieknoppen die middenpaneel openen -->
+          <div class="mt-3 grid grid-cols-1 gap-2">
+            <button id="openHeists" class="btn w-full px-4 py-3 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-600)] text-white">Overvallen</button>
           </div>
         </div>
       </div>
 
-      <!-- (VERVALLEN) Overvallen-lijst stond hier; nu vervangen door de knop hierboven -->
-
-      <!-- Werk blijft als tegel -->
+      <!-- Werk blijft in de linkerkolom -->
       <section class="panel p-3 md:p-4 overflow-auto">
         <h2 class="font-semibold mb-2">Werk</h2>
         <ul class="space-y-2 text-sm" id="workList"></ul>
       </section>
     </aside>
 
-    <!-- Middle: Log -->
-    <section class="panel p-3 md:p-4 overflow-auto">
+    <!-- Middle: wisselende weergave -->
+    <section id="centerPanel" class="panel p-3 md:p-4 overflow-auto">
       <div class="flex items-center justify-between mb-2">
-        <h2 class="text-lg font-extrabold">Stad & Logboek</h2>
-        <div class="text-xs">v0.3</div>
+        <h2 id="centerTitle" class="text-lg font-extrabold">Stad & Logboek</h2>
+        <div class="text-xs"><span id="centerTag" class="tag">v0.3</span></div>
       </div>
-      <div id="log" class="space-y-1 text-sm"></div>
-    </section>
 
-    <!-- Right: Shop + Inventaris -->
-    <aside class="flex flex-col gap-3 md:gap-4 overflow-hidden">
-      <section class="panel p-3 md:p-4 overflow-auto">
-        <h3 class="font-semibold mb-2">Kattenshop</h3>
-        <ul class="text-sm space-y-2">
-          <li class="flex items-center justify-between bg-pink-50 rounded-lg px-3 py-2">
-            <span>🌿 Kattenkruid (+12 energie)</span>
-            <button data-buy="kruid" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop (3)</button>
-          </li>
-          <li class="flex items-center justify-between bg-pink-50 rounded-lg px-3 py-2">
-            <span>🔦 Laserpen (+3% overval)</span>
-            <button data-buy="laser" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop (5)</button>
-          </li>
-          <li class="flex items-center justify-between bg-pink-50 rounded-lg px-3 py-2">
-            <span>🧸 Pluche muis (+1 leven)</span>
-            <button data-buy="muis" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop (6)</button>
-          </li>
-          <li class="flex items-center justify-between bg-pink-50 rounded-lg px-3 py-2">
-            <span>💍 Halsband (−15% alert)</span>
-            <button data-buy="halsband" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop (8)</button>
-          </li>
-        </ul>
-      </section>
-      <section class="panel p-3 md:p-4 overflow-auto">
-        <h3 class="font-semibold mb-2">Inventaris</h3>
-        <ul class="text-sm space-y-2" id="inv"></ul>
-      </section>
-    </aside>
-  </main>
+      <!-- feedbackbalk -->
+      <div id="centerResult" class="hidden mb-3 p-3 rounded-xl border"></div>
 
-  <!-- MODAL: Overvallen -->
-  <div id="heistModal" class="fixed inset-0 hidden items-center justify-center p-4 z-50">
-    <!-- backdrop -->
-    <div class="absolute inset-0 bg-black/60"></div>
-    <!-- panel -->
-    <div class="relative w-full max-w-2xl panel p-0 overflow-hidden">
-      <div class="flex items-center justify-between px-4 py-3 border-b border-pink-200">
-        <h3 class="font-bold">Overvallen</h3>
-        <button id="closeHeists" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Sluiten</button>
+      <!-- log -->
+      <div id="logView">
+        <div id="log" class="space-y-1 text-sm"></div>
       </div>
-      <div class="p-4">
+
+      <!-- overvallen -->
+      <div id="heistsView" class="hidden">
         <p class="text-sm text-black/70 mb-3">
           Begin bovenaan bij de makkelijke doelen. Elke poging geeft <b>XP</b> — meer XP = hogere <b>slagingskans</b>.
           Items zoals de <i>laserpen</i> helpen ook. Let op je <b>energie</b> en <b>honden-alert</b>!
         </p>
-        <ul id="heistModalList" class="space-y-2 text-sm"></ul>
+        <ul id="heistListCenter" class="space-y-2 text-sm"></ul>
+        <div class="mt-4">
+          <button data-nav="log" class="btn px-4 py-2 rounded-lg bg-black/5 hover:bg-black/10">← Terug naar Logboek</button>
+        </div>
       </div>
-    </div>
-  </div>
+
+      <!-- shop -->
+      <div id="shopView" class="hidden">
+        <p class="text-sm text-black/70 mb-3">
+          Besteed je <b>blikvoer</b> aan items. Sommige items (zoals de <i>laserpen</i>) verhogen je slagingskans bij overvallen.
+        </p>
+        <ul id="shopListCenter" class="text-sm space-y-2"></ul>
+        <div class="mt-4">
+          <button data-nav="log" class="btn px-4 py-2 rounded-lg bg-black/5 hover:bg-black/10">← Terug naar Logboek</button>
+        </div>
+      </div>
+
+      <!-- inventaris -->
+      <div id="invView" class="hidden">
+        <p class="text-sm text-black/70 mb-3">Gebruik items voor herstel of voordeel. Sommige zijn verbruiksitems.</p>
+        <ul id="invListCenter" class="text-sm space-y-2"></ul>
+        <div class="mt-4">
+          <button data-nav="log" class="btn px-4 py-2 rounded-lg bg-black/5 hover:bg-black/10">← Terug naar Logboek</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: nu alleen knoppen die middenpaneel openen -->
+    <aside class="flex flex-col gap-3 md:gap-4 overflow-hidden">
+      <section class="panel p-4 sticky top-3">
+        <h3 class="font-semibold mb-2">Snelkoppelingen</h3>
+        <div class="grid grid-cols-1 gap-2">
+          <button id="openShop" class="btn w-full px-4 py-2 rounded-lg bg-black/5 hover:bg-black/10">Kattenshop</button>
+          <button id="openInv" class="btn w-full px-4 py-2 rounded-lg bg-black/5 hover:bg-black/10">Inventaris</button>
+        </div>
+      </section>
+    </aside>
+  </main>
 
   <script>
     const $=(s,r=document)=>r.querySelector(s); const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
@@ -153,7 +151,6 @@
       {key:'melkfabriek', name:'Overval op melkfabriek', base:0.27, cost:20, payout:[14,26], rep:5, heatS:12, heatF:16, hpF:1, emoji:'🥛'},
       {key:'dierenwinkel', name:'Dierenwinkel-raid', base:0.20, cost:22, payout:[20,34], rep:7, heatS:14, heatF:20, hpF:2, emoji:'🐾'}
     ];
-
     const WORK=[
       {key:'knuffel', name:'Poseren als knuffel', cost:8, payout:[3,7], rep:1, emoji:'🧸'},
       {key:'ratten', name:'Ratten vangen in de haven', cost:10, payout:[5,10], rep:2, emoji:'🐭'},
@@ -168,29 +165,45 @@
     function load(){ try{ const raw=localStorage.getItem(SAVE_KEY); return raw?JSON.parse(raw):null }catch{return null} }
     function reset(){ localStorage.removeItem(SAVE_KEY); Object.assign(state,{name:'',cash:10,hp:9,en:100,rep:0,heat:0,day:1,items:{kruid:0,laser:0,muis:0,halsband:0},xp:{heist:{},work:{}},seed:Math.floor(Math.random()*1e9)}); update(); log('🔄 Reset voltooid.'); }
 
-    function update(){
+    // ---------- UI state ----------
+    function showView(kind){
+      // verberg alles
+      $('#logView').classList.add('hidden');
+      $('#heistsView').classList.add('hidden');
+      $('#shopView').classList.add('hidden');
+      $('#invView').classList.add('hidden');
+      $('#centerResult').classList.add('hidden');
+
+      // toon gekozen
+      if(kind==='log'){ $('#centerTitle').textContent='Stad & Logboek'; $('#logView').classList.remove('hidden'); }
+      if(kind==='heists'){ $('#centerTitle').textContent='Overvallen'; $('#heistsView').classList.remove('hidden'); renderHeists('heistListCenter'); }
+      if(kind==='shop'){ $('#centerTitle').textContent='Kattenshop'; $('#shopView').classList.remove('hidden'); renderShop(); }
+      if(kind==='inv'){ $('#centerTitle').textContent='Inventaris'; $('#invView').classList.remove('hidden'); renderInvCenter(); }
+    }
+
+    // ---------- stats helpers ----------
+    function updateHUD(){
       $('#cash').textContent=state.cash; $('#hp').textContent=state.hp; $('#en').textContent=state.en+'%'; $('#heat').textContent=state.heat+'%'; $('#rep').textContent=state.rep;
       $('#day').textContent=state.day; $('#rank').textContent=rank(); $('#enBar').style.width=clamp(state.en)+'%'; $('#heatBar').style.width=clamp(state.heat)+'%';
       $('#hudCash').textContent=state.cash; $('#hudHP').textContent=state.hp; $('#hudEN').textContent=state.en+'%'; $('#hudHeat').textContent=state.heat+'%'; $('#hudRep').textContent=state.rep;
       $('#charName').value=state.name||'';
-      renderWork(); renderInv();
     }
+    function update(){ updateHUD(); renderWork(); }
 
     function rank(){ const R=[{n:'Kittenspion',r:0},{n:'Straatkat',r:30},{n:'Klapkat',r:80},{n:'Miauwster',r:150},{n:'Katerbaas',r:250},{n:'Oude wijze poes',r:400},{n:'Don Purrino',r:700}]; let cur=R[0].n; for(const r of R){ if(state.rep>=r.r) cur=r.n; else break;} return cur; }
 
-    function spend(c){ if(state.en<c){ log('😴 Te moe om te miauwen.'); return false;} state.en=clamp(state.en-c); return true; }
+    function spend(c){ if(state.en<c){ toast('😴 Te moe om te miauwen.'); return false;} state.en=clamp(state.en-c); return true; }
     function addCash(c){ state.cash=Math.max(0,state.cash+c); }
     function addHP(h){ state.hp=Math.max(0,state.hp+h); }
     function addRep(r){ state.rep=Math.max(0,state.rep+r); }
     function addHeat(h){ state.heat=clamp(state.heat+h); }
 
+    // ---------- Heists ----------
     function heistChance(h){
       const xp = (state.xp.heist[h.key]||0);
       let chance = h.base + (xp*0.005) + (state.items.laser*0.03); // +0,5% per XP, +3% per laser
-      chance = Math.min(chance, 0.9); // max 90%
-      return chance;
+      return Math.min(chance, 0.9);
     }
-
     function doHeist(key){
       const h = HEISTS.find(x=>x.key===key); if(!h) return;
       if(!spend(h.cost)) return;
@@ -198,36 +211,18 @@
       const roll = rng();
       if(roll < chance){
         const gain = h.payout[0] + Math.floor(rng() * (h.payout[1]-h.payout[0]+1));
-        addCash(gain); addRep(h.rep); addHeat(h.heatS); state.xp.heist[key]=(state.xp.heist[key]||0)+3; // succes: +3 XP
+        addCash(gain); addRep(h.rep); addHeat(h.heatS); state.xp.heist[key]=(state.xp.heist[key]||0)+3;
+        showResult(`✅ Succes: ${h.name}. +${gain} blikvoer, +${h.rep} purr, +alert.`);
         log(`✅ ${h.emoji} Succes: ${h.name}. +${gain} blikvoer, +${h.rep} purr, +alert.`);
       } else {
-        addHP(-h.hpF); addHeat(h.heatF); state.xp.heist[key]=(state.xp.heist[key]||0)+1; // falen: +1 XP
-        log(`❌ Mislukt: ${h.name}. −${h.hpF} leven, +alert.`);
+        addHP(-h.hpF); addHeat(h.heatF); state.xp.heist[key]=(state.xp.heist[key]||0)+1;
+        showResult(`❌ Mislukt: ${h.name}. −${h.hpF} leven, +alert.`);
+        log(`❌ ${h.emoji} Mislukt: ${h.name}. −${h.hpF} leven, +alert.`);
       }
-      update(); check();
+      update(); check(); renderHeists('heistListCenter');
     }
-
-    function doWork(key){
-      const w = WORK.find(x=>x.key===key); if(!w) return;
-      if(!spend(w.cost)) return;
-      const base = w.payout[0]; const extra = Math.floor(rng()*(w.payout[1]-w.payout[0]+1));
-      const xp = (state.xp.work[w.key]||0);
-      const bonus = Math.floor(xp*0.05); // +1 per 20 XP ongeveer
-      addCash(base+extra+bonus); addRep(w.rep); if(w.heat) addHeat(w.heat);
-      state.xp.work[w.key]=(state.xp.work[w.key]||0)+2;
-      log(`${w.emoji} Werk: ${w.name}. +${base+extra+bonus} blikvoer${w.heat? ", +alert":""}.`);
-      update();
-    }
-
-    function rest(){ state.en=clamp(state.en+12); state.heat=clamp(state.heat-3); log('🛌 Even rust: +12 energie, −3 alert.'); update(); }
-    function nextDay(){ state.day++; state.en=clamp(state.en+25); state.heat=clamp(state.heat-5);
-      const r=rng(); if(r<.15){ const fine=2+Math.floor(rng()*6); addCash(-fine); addHeat(3); log(`🐕 Boete: −${fine} blikvoer (+alert)`);} else if(r<.28){ const find=2+Math.floor(rng()*6); addCash(find); log(`🎁 Je vond ${find} blikvoer in een doos.`);} else if(r<.34){ addHP(-1); log('🛁 Je viel in de badkuip. −1 leven.'); }
-      update(); check(); }
-
-    // ---------- Renderers ----------
-    function renderHeists(ulId='heistModalList'){
-      const ul = document.getElementById(ulId); if(!ul) return;
-      ul.innerHTML='';
+    function renderHeists(ulId){
+      const ul=document.getElementById(ulId); ul.innerHTML='';
       HEISTS.forEach(h=>{
         const xp = state.xp.heist[h.key]||0; const ch=heistChance(h);
         const li=document.createElement('li'); li.className='flex items-center gap-3 bg-pink-50 rounded-xl px-3 py-2 border border-pink-100';
@@ -245,9 +240,21 @@
         `;
         ul.appendChild(li);
       });
-      $$('[data-heist]', document.getElementById(ulId)).forEach(b=> b.addEventListener('click', ()=> doHeist(b.getAttribute('data-heist'))));
+      $$('[data-heist]', ul).forEach(b=> b.addEventListener('click', ()=> doHeist(b.getAttribute('data-heist'))));
     }
 
+    // ---------- Werk ----------
+    function doWork(key){
+      const w = WORK.find(x=>x.key===key); if(!w) return;
+      if(!spend(w.cost)) return;
+      const base = w.payout[0]; const extra = Math.floor(rng()*(w.payout[1]-w.payout[0]+1));
+      const xp = (state.xp.work[w.key]||0);
+      const bonus = Math.floor(xp*0.05);
+      addCash(base+extra+bonus); addRep(w.rep); if(w.heat) addHeat(w.heat);
+      state.xp.work[w.key]=(state.xp.work[w.key]||0)+2;
+      log(`${w.emoji} Werk: ${w.name}. +${base+extra+bonus} blikvoer${w.heat? ", +alert":""}.`);
+      update();
+    }
     function renderWork(){
       const ul=$('#workList'); ul.innerHTML='';
       WORK.forEach(w=>{
@@ -260,50 +267,4 @@
               <p class="font-semibold truncate">${w.name}</p>
               <span class="text-xs">Energie ${w.cost}</span>
             </div>
-            <p class="text-xs text-black/60">Beloning ${w.payout[0]}–${w.payout[1]} · Purr +${w.rep}${w.heat? ' · +alert':''}</p>
-            <div class="xbar mt-1"><i style="width:${Math.min(100, xp)}%"></i></div>
-          </div>
-          <button class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10 whitespace-nowrap" data-work="${w.key}">Aan de slag</button>`;
-        ul.appendChild(li);
-      });
-      $$('[data-work]').forEach(b=> b.addEventListener('click', ()=> doWork(b.getAttribute('data-work'))));
-    }
-
-    function renderInv(){
-      const names={kruid:'🌿 Kattenkruid',laser:'🔦 Laserpen',muis:'🧸 Pluche muis',halsband:'💍 Halsband'};
-      const ul=$('#inv'); ul.innerHTML='';
-      Object.keys(state.items).forEach(k=>{
-        const li=document.createElement('li');
-        li.className='flex items-center justify-between bg-white/70 rounded-lg px-3 py-2';
-        li.innerHTML=`<span>${names[k]} × ${state.items[k]}</span><div class='space-x-2'>${k!=='laser'?`<button data-use='${k}' class='btn px-2 py-1 rounded bg-black/5 hover:bg-black/10'>Gebruik</button>`:''}</div>`;
-        ul.appendChild(li);
-      });
-      $$('[data-use]').forEach(b=> b.addEventListener('click',()=>useItem(b.getAttribute('data-use'))));
-    }
-
-    // ---------- Items, log, meldingen ----------
-    function buy(item){ const prices={kruid:3,laser:5,muis:6,halsband:8}; if(state.cash<prices[item]) return toast('Niet genoeg blikvoer'); addCash(-prices[item]); state.items[item]++; log(`🛍️ Gekocht: ${item}.`); update(); }
-    function useItem(item){ if(state.items[item]<=0) return toast('Je hebt dat item niet'); if(item==='kruid'){ state.items.kruid--; state.en=clamp(state.en+12); log('🌿 Kattenkruid: +12 energie.'); } else if(item==='muis'){ state.items.muis--; addHP(1); log('🧸 Pluche muis: +1 leven.'); } else if(item==='halsband'){ state.items.halsband--; addHeat(-15); log('💍 Halsband: −15% alert.'); } update(); }
-    function log(t){ const d=document.createElement('div'); d.className='bg-white border border-pink-200/60 rounded px-3 py-2'; d.textContent=t; $('#log').prepend(d); }
-    function check(){ if(state.hp<=0) log('🚑 Dierenambulance… GAME OVER.'); if(state.heat>=100) log('🚓 Te veel honden-alert! GAME OVER.'); }
-    function toast(msg){ const t=document.createElement('div'); t.className='fixed bottom-4 left-1/2 -translate-x-1/2 bg-black/80 text-white px-3 py-2 rounded-xl text-sm'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),1400); }
-
-    // ---------- Modal open/dicht ----------
-    const modal = $('#heistModal');
-    function openHeistModal(){ modal.classList.remove('hidden'); modal.classList.add('flex'); renderHeists('heistModalList'); }
-    function closeHeistModal(){ modal.classList.add('hidden'); modal.classList.remove('flex'); $('#heistModalList').innerHTML=''; }
-    $('#openHeists').addEventListener('click', openHeistModal);
-    $('#closeHeists').addEventListener('click', closeHeistModal);
-    modal.addEventListener('click', (e)=>{ if(e.target===modal) closeHeistModal(); }); // klik buiten paneel = sluiten
-
-    // ---------- Bindings ----------
-    $$('[data-buy]').forEach(b=> b.addEventListener('click', ()=> buy(b.getAttribute('data-buy'))));
-    $('#nextDay').addEventListener('click', nextDay); $('#restBtn').addEventListener('click', rest);
-    $('#saveBtn').addEventListener('click', save); $('#resetBtn').addEventListener('click', reset);
-    $('#charName').addEventListener('input',e=>{ state.name=e.target.value; });
-
-    // Init
-    update(); if(!load()) log('Welkom! Klik op Overvallen om te beginnen. XP verhoogt je kans. 🐾');
-  </script>
-</body>
-</html>
+            <p class="text-xs text-black/60">Beloning ${w.payout[0]}–
