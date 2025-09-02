@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#ff8fb2" />
+  <title>MafiaCats – Game (Overvallen met XP)</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{ --accent:#ff8fb2; --accent-600:#ff6f9c; --lav:#cdb4f5; }
+    body{ background:#fff6f8; font-family:'Outfit',sans-serif; color:#2e2a2c; }
+    .panel{ background:#fff; border:1px solid #f4d4e0; border-radius:1rem; box-shadow:0 4px 16px rgba(0,0,0,.05); }
+    .btn{ font-weight:600; transition:.15s; }
+    .btn:hover{ transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.1); }
+    .bar{ height:8px; border-radius:999px; background:#ffe1ec; overflow:hidden }
+    .bar>i{ display:block; height:100%; background:linear-gradient(90deg, var(--accent), var(--lav)); }
+    .xbar{ height:6px; border-radius:999px; background:#f7e7ef; overflow:hidden }
+    .xbar>i{ display:block; height:100%; background:linear-gradient(90deg, #ffc1d6, #cdb4f5); }
+    .pill{ font-size:.7rem; padding:.15rem .45rem; border-radius:999px; background:#fff1f6; border:1px solid #ffd6e5; color:#9b3b62; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="px-4 py-2 bg-white/85 backdrop-blur border-b border-pink-200 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2 font-extrabold text-lg">🐾 Mafia<span class="text-pink-500">Cats</span></a>
+    <div class="flex items-center gap-3 text-sm">
+      <span class="hidden md:flex items-center gap-3">
+        <span>🥫 <b id="hudCash">10</b></span>
+        <span>💖 <b id="hudHP">9</b></span>
+        <span>💤 <b id="hudEN">100%</b></span>
+        <span>🐶 <b id="hudHeat">0%</b></span>
+        <span>✨ <b id="hudRep">0</b></span>
+      </span>
+      <button id="saveBtn" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Opslaan</button>
+      <button id="resetBtn" class="btn px-3 py-1.5 rounded-lg bg-pink-200 hover:bg-pink-300">Reset</button>
+    </div>
+  </header>
+
+  <!-- Layout -->
+  <main class="flex-1 max-w-7xl mx-auto w-full p-3 md:p-4 grid lg:grid-cols-[320px_1fr_320px] gap-3 md:gap-4 overflow-hidden" style="height:calc(100vh - 56px)">
+    <!-- Left: Character + Tiles -->
+    <aside class="flex flex-col gap-3 md:gap-4 overflow-hidden">
+      <div class="panel p-4 sticky top-3">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-pink-200 flex items-center justify-center text-2xl">🐱</div>
+          <div class="grow">
+            <input id="charName" class="w-full bg-pink-50/50 border border-pink-200 rounded-lg px-2 py-1 text-sm" placeholder="Jouw kattennaam"/>
+            <p class="text-xs text-black/60 mt-1">Rang: <span id="rank">Kittenspion</span> · Dag <span id="day">1</span></p>
+          </div>
+        </div>
+        <div class="mt-3 space-y-2 text-xs">
+          <div>💤 Energie <span class="float-right" id="en">100%</span></div>
+          <div class="bar"><i id="enBar" style="width:100%"></i></div>
+          <div>🐶 Alert <span class="float-right" id="heat">0%</span></div>
+          <div class="bar"><i id="heatBar" style="width:0%"></i></div>
+          <div class="grid grid-cols-3 gap-2 text-center mt-2">
+            <div class="panel p-2"><div class="text-lg" id="cash">10</div><div class="text-[10px] text-black/60">🥫 Blikvoer</div></div>
+            <div class="panel p-2"><div class="text-lg" id="hp">9</div><div class="text-[10px] text-black/60">💖 Levens</div></div>
+            <div class="panel p-2"><div class="text-lg" id="rep">0</div><div class="text-[10px] text-black/60">✨ Purr</div></div>
+          </div>
+          <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+            <button id="nextDay" class="btn px-3 py-2 rounded-lg bg-pink-500 text-white">Volgende dag</button>
+            <button id="restBtn" class="btn px-3 py-2 rounded-lg bg-black/5 hover:bg-black/10">Rust</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overvallen -->
+      <section class="panel p-3 md:p-4 overflow-auto">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-semibold">Overvallen</h2>
+          <span class="pill">Ervaring verhoogt je slagingskans</span>
+        </div>
+        <ul class="space-y-2 text-sm" id="heistList"></ul>
+      </section>
+
+      <!-- Werk -->
+      <section class="panel p-3 md:p-4 overflow-auto">
+        <h2 class="font-semibold mb-2">Werk</h2>
+        <ul class="space-y-2 text-sm" id="workList"></ul>
+      </section>
+    </aside>
+
+    <!-- Middle: Log -->
+    <section class="panel p-3 md:p-4 overflow-auto">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-extrabold">Stad & Logboek</h2>
+        <div class="text-xs">v0.3</div>
+      </div>
+      <div id="log" class="space-y-1 text-sm"></div>
+    </section>
+
+    <!-- Right: Shop + Inventaris -->
+    <aside class="flex flex-col gap-3 md:gap-4 overflow-hidden">
+      <section class="panel p-3 md:p-4 overflow-auto">
+        <h3 class="font-semibold mb-2">Kattenshop</h3>
+        <ul class="text-sm space-y-2">
+          <li class="flex items-center justify-between bg-pink-50 rounded-lg px-3 py-2">
+            <span>🌿 Kattenkruid (+12 energie)</span>
+            <button data-buy="kruid" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop (3)</button>
+          </li>
+          <li class="flex items-center justify-between bg-pink-50 rounded-lg px-3 py-2">
+            <span>🔦 Laserpen (+3% overval)</span>
+            <button data-buy="laser" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop (5)</button>
+          </li>
+          <li class="flex items-center justify-between bg-pink-50 rounded-lg px-3 py-2">
+            <span>🧸 Pluche muis (+1 leven)</span>
+            <button data-buy="muis" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop (6)</button>
+          </li>
+          <li class="flex items-center justify-between bg-pink-50 rounded-lg px-3 py-2">
+            <span>💍 Halsband (−15% alert)</span>
+            <button data-buy="halsband" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop (8)</button>
+          </li>
+        </ul>
+      </section>
+      <section class="panel p-3 md:p-4 overflow-auto">
+        <h3 class="font-semibold mb-2">Inventaris</h3>
+        <ul class="text-sm space-y-2" id="inv"></ul>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const $=(s,r=document)=>r.querySelector(s); const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+    const SAVE_KEY='mafiacats_save_v3';
+    const state=load()||{name:'',cash:10,hp:9,en:100,rep:0,heat:0,day:1,items:{kruid:0,laser:0,muis:0,halsband:0},xp:{heist:{},work:{}},seed:Math.floor(Math.random()*1e9)};
+
+    const HEISTS=[
+      {key:'visboer', name:'Jat vis bij de visboer', base:0.55, cost:10, payout:[4,9], rep:2, heatS:6, heatF:8, hpF:1, emoji:'🐟'},
+      {key:'keukenkast', name:'Inbreken in keukenkast (mensen)', base:0.45, cost:12, payout:[6,13], rep:3, heatS:8, heatF:10, hpF:1, emoji:'🍽️'},
+      {key:'magazijn', name:'Supermarkt-magazijn', base:0.35, cost:16, payout:[10,18], rep:4, heatS:10, heatF:12, hpF:1, emoji:'📦'},
+      {key:'melkfabriek', name:'Overval op melkfabriek', base:0.27, cost:20, payout:[14,26], rep:5, heatS:12, heatF:16, hpF:1, emoji:'🥛'},
+      {key:'dierenwinkel', name:'Dierenwinkel-raid', base:0.20, cost:22, payout:[20,34], rep:7, heatS:14, heatF:20, hpF:2, emoji:'🐾'}
+    ];
+
+    const WORK=[
+      {key:'knuffel', name:'Poseren als knuffel', cost:8, payout:[3,7], rep:1, emoji:'🧸'},
+      {key:'ratten', name:'Ratten vangen in de haven', cost:10, payout:[5,10], rep:2, emoji:'🐭'},
+      {key:'chauffeur', name:'Dozen-mobiel chauffeur', cost:12, payout:[7,12], rep:2, heat:3, emoji:'🚚'}
+    ];
+
+    function rng(){ state.seed=(state.seed*1664525+1013904223)>>>0; return (state.seed>>>0)/4294967296; }
+    const clamp=(n,min=0,max=100)=>Math.max(min,Math.min(max,n));
+    const pct=(x)=> Math.round(x*100);
+
+    function save(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); toast('💾 Opgeslagen'); }
+    function load(){ try{ const raw=localStorage.getItem(SAVE_KEY); return raw?JSON.parse(raw):null }catch{return null} }
+    function reset(){ localStorage.removeItem(SAVE_KEY); Object.assign(state,{name:'',cash:10,hp:9,en:100,rep:0,heat:0,day:1,items:{kruid:0,laser:0,muis:0,halsband:0},xp:{heist:{},work:{}},seed:Math.floor(Math.random()*1e9)}); update(); log('🔄 Reset voltooid.'); }
+
+    function update(){
+      $('#cash').textContent=state.cash; $('#hp').textContent=state.hp; $('#en').textContent=state.en+'%'; $('#heat').textContent=state.heat+'%'; $('#rep').textContent=state.rep;
+      $('#day').textContent=state.day; $('#rank').textContent=rank(); $('#enBar').style.width=clamp(state.en)+'%'; $('#heatBar').style.width=clamp(state.heat)+'%';
+      $('#hudCash').textContent=state.cash; $('#hudHP').textContent=state.hp; $('#hudEN').textContent=state.en+'%'; $('#hudHeat').textContent=state.heat+'%'; $('#hudRep').textContent=state.rep;
+      $('#charName').value=state.name||'';
+      renderHeists(); renderWork(); renderInv();
+    }
+
+    function rank(){ const R=[{n:'Kittenspion',r:0},{n:'Straatkat',r:30},{n:'Klapkat',r:80},{n:'Miauwster',r:150},{n:'Katerbaas',r:250},{n:'Oude wijze poes',r:400},{n:'Don Purrino',r:700}]; let cur=R[0].n; for(const r of R){ if(state.rep>=r.r) cur=r.n; else break;} return cur; }
+
+    function spend(c){ if(state.en<c){ log('😴 Te moe om te miauwen.'); return false;} state.en=clamp(state.en-c); return true; }
+    function addCash(c){ state.cash=Math.max(0,state.cash+c); }
+    function addHP(h){ state.hp=Math.max(0,state.hp+h); }
+    function addRep(r){ state.rep=Math.max(0,state.rep+r); }
+    function addHeat(h){ state.heat=clamp(state.heat+h); }
+
+    function heistChance(h){
+      const xp = (state.xp.heist[h.key]||0);
+      let chance = h.base + (xp*0.005) + (state.items.laser*0.03); // +0,5% per XP, +3% per laser
+      chance = Math.min(chance, 0.9); // max 90%
+      return chance;
+    }
+
+    function doHeist(key){
+      const h = HEISTS.find(x=>x.key===key); if(!h) return;
+      if(!spend(h.cost)) return;
+      const chance = heistChance(h);
+      const roll = rng();
+      if(roll < chance){
+        const gain = h.payout[0] + Math.floor(rng() * (h.payout[1]-h.payout[0]+1));
+        addCash(gain); addRep(h.rep); addHeat(h.heatS); state.xp.heist[key]=(state.xp.heist[key]||0)+3; // +3 XP bij succes
+        log(`✅ ${h.emoji} Succes: ${h.name}. +${gain} blikvoer, +${h.rep} purr, +alert.`);
+      } else {
+        addHP(-h.hpF); addHeat(h.heatF); state.xp.heist[key]=(state.xp.heist[key]||0)+1; // +1 XP bij falen
+        log(`❌ Mislukt: ${h.name}. −${h.hpF} leven, +alert.`);
+      }
+      update(); check();
+    }
+
+    function doWork(key){
+      const w = WORK.find(x=>x.key===key); if(!w) return;
+      if(!spend(w.cost)) return;
+      const base = w.payout[0]; const extra = Math.floor(rng()*(w.payout[1]-w.payout[0]+1));
+      const xp = (state.xp.work[w.key]||0);
+      const bonus = Math.floor(xp*0.05); // klein +1 per 20 XP
+      addCash(base+extra+bonus); addRep(w.rep); if(w.heat) addHeat(w.heat);
+      state.xp.work[w.key]=(state.xp.work[w.key]||0)+2;
+      log(`${w.emoji} Werk: ${w.name}. +${base+extra+bonus} blikvoer${w.heat? ", +alert":""}.`);
+      update();
+    }
+
+    function rest(){ state.en=clamp(state.en+12); state.heat=clamp(state.heat-3); log('🛌 Even rust: +12 energie, −3 alert.'); update(); }
+    function nextDay(){ state.day++; state.en=clamp(state.en+25); state.heat=clamp(state.heat-5);
+      const r=rng(); if(r<.15){ const fine=2+Math.floor(rng()*6); addCash(-fine); addHeat(3); log(`🐕 Boete: −${fine} blikvoer (+alert)`);} else if(r<.28){ const find=2+Math.floor(rng()*6); addCash(find); log(`🎁 Je vond ${find} blikvoer in een doos.`);} else if(r<.34){ addHP(-1); log('🛁 Je viel in de badkuip. −1 leven.'); }
+      update(); check(); }
+
+    function renderHeists(){
+      const ul=$('#heistList'); ul.innerHTML='';
+      HEISTS.forEach(h=>{
+        const xp = state.xp.heist[h.key]||0; const ch=heistChance(h);
+        const li=document.createElement('li'); li.className='flex items-center gap-3 bg-pink-50 rounded-xl px-3 py-2 border border-pink-100';
+        li.innerHTML = `
+          <div class="text-xl">${h.emoji}</div>
+          <div class="grow min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <p class="font-semibold truncate">${h.name}</p>
+              <span class="text-xs">Kans: <b>${pct(ch)}%</b></span>
+            </div>
+            <p class="text-xs text-black/60">Energie ${h.cost} · Buit ${h.payout[0]}–${h.payout[1]} · Purr +${h.rep}</p>
+            <div class="xbar mt-1"><i style="width:${Math.min(100, xp)}%"></i></div>
+          </div>
+          <button class="btn px-3 py-1.5 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-600)] text-white whitespace-nowrap" data-heist="${h.key}">Doe overval</button>
+        `;
+        ul.appendChild(li);
+      });
+      $$('[data-heist]').forEach(b=> b.addEventListener('click', ()=> doHeist(b.getAttribute('data-heist'))));
+    }
+
+    function renderWork(){
+      const ul=$('#workList'); ul.innerHTML='';
+      WORK.forEach(w=>{
+        const xp = state.xp.work[w.key]||0;
+        const li=document.createElement('li'); li.className='flex items-center gap-3 bg-white rounded-xl px-3 py-2 border border-pink-100';
+        li.innerHTML = `
+          <div class="text-xl">${w.emoji}</div>
+          <div class="grow min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <p class="font-semibold truncate">${w.name}</p>
+              <span class="text-xs">Energie ${w.cost}</span>
+            </div>
+            <p class="text-xs text-black/60">Beloning ${w.payout[0]}–${w.payout[1]} · Purr +${w.rep}${w.heat? ' · +alert':''}</p>
+            <div class="xbar mt-1"><i style="width:${Math.min(100, xp)}%"></i></div>
+          </div>
+          <button class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10 whitespace-nowrap" data-work="${w.key}">Aan de slag</button>`;
+        ul.appendChild(li);
+      });
+      $$('[data-work]').forEach(b=> b.addEventListener('click', ()=> doWork(b.getAttribute('data-work'))));
+    }
+
+    function renderInv(){
+      const names={kruid:'🌿 Kattenkruid',laser:'🔦 Laserpen',muis:'🧸 Pluche muis',halsband:'💍 Halsband'};
+      const ul=$('#inv'); ul.innerHTML='';
+      Object.keys(state.items).forEach(k=>{
+        const li=document.createElement('li');
+        li.className='flex items-center justify-between bg-white/70 rounded-lg px-3 py-2';
+        li.innerHTML=`<span>${names[k]} × ${state.items[k]}</span><div class='space-x-2'>${k!=='laser'?`<button data-use='${k}' class='btn px-2 py-1 rounded bg-black/5 hover:bg-black/10'>Gebruik</button>`:''}</div>`;
+        ul.appendChild(li);
+      });
+      $$('[data-use]').forEach(b=> b.addEventListener('click',()=>useItem(b.getAttribute('data-use'))));
+    }
+
+    function buy(item){ const prices={kruid:3,laser:5,muis:6,halsband:8}; if(state.cash<prices[item]) return toast('Niet genoeg blikvoer'); addCash(-prices[item]); state.items[item]++; log(`🛍️ Gekocht: ${item}.`); update(); }
+    function useItem(item){ if(state.items[item]<=0) return toast('Je hebt dat item niet'); if(item==='kruid'){ state.items.kruid--; state.en=clamp(state.en+12); log('🌿 Kattenkruid: +12 energie.'); } else if(item==='muis'){ state.items.muis--; addHP(1); log('🧸 Pluche muis: +1 leven.'); } else if(item==='halsband'){ state.items.halsband--; addHeat(-15); log('💍 Halsband: −15% alert.'); } update(); }
+
+    function log(t){ const d=document.createElement('div'); d.className='bg-white border border-pink-200/60 rounded px-3 py-2'; d.textContent=t; $('#log').prepend(d); }
+    function check(){ if(state.hp<=0) log('🚑 Dierenambulance… GAME OVER.'); if(state.heat>=100) log('🚓 Te veel honden-alert! GAME OVER.'); }
+    function toast(msg){ const t=document.createElement('div'); t.className='fixed bottom-4 left-1/2 -translate-x-1/2 bg-black/80 text-white px-3 py-2 rounded-xl text-sm'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),1400); }
+
+    $$('[data-buy]').forEach(b=> b.addEventListener('click', ()=> buy(b.getAttribute('data-buy'))));
+    $('#nextDay').addEventListener('click', nextDay); $('#restBtn').addEventListener('click', rest);
+    $('#saveBtn').addEventListener('click', save); $('#resetBtn').addEventListener('click', reset);
+    $('#charName').addEventListener('input',e=>{ state.name=e.target.value; });
+
+    update(); if(!load()) log('Welkom! Overvallen geven XP → hogere kans. Begin bovenaan bij de visboer. 🐾');
+  </script>
+</body>
+</html>
