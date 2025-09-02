@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#ff8fb2" />
+  <title>MafiaCats – Game (Compact HUD)</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --accent:#ff8fb2; --accent-600:#ff6f9c; --mint:#b7f7d4; --lav:#cdb4f5;
+    }
+    body{ background:#fff6f8; font-family:'Outfit',sans-serif; color:#2e2a2c; }
+    .panel{ background:#fff; border:1px solid #f4d4e0; border-radius:1rem; box-shadow:0 4px 16px rgba(0,0,0,.05); }
+    .btn{ font-weight:600; transition:.15s; }
+    .btn:hover{ transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.1); }
+    .bar{ height:8px; border-radius:999px; background:#ffe1ec; overflow:hidden }
+    .bar>i{ display:block; height:100%; background:linear-gradient(90deg, var(--accent), var(--lav)); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Header (compact) -->
+  <header class="px-4 py-2 bg-white/85 backdrop-blur border-b border-pink-200 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2 font-extrabold text-lg">🐾 Mafia<span class="text-pink-500">Cats</span></a>
+    <div class="flex items-center gap-3 text-sm">
+      <span class="hidden md:flex items-center gap-3">
+        <span title="Blikvoer">🥫 <b id="hudCash">10</b></span>
+        <span title="Levens">💖 <b id="hudHP">9</b></span>
+        <span title="Energie">💤 <b id="hudEN">100%</b></span>
+        <span title="Alert">🐶 <b id="hudHeat">0%</b></span>
+        <span title="Purr">✨ <b id="hudRep">0</b></span>
+      </span>
+      <button id="saveBtn" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Opslaan</button>
+      <button id="resetBtn" class="btn px-3 py-1.5 rounded-lg bg-pink-200 hover:bg-pink-300">Reset</button>
+    </div>
+  </header>
+
+  <!-- 3‑koloms layout, 100vh zonder scroll-churn -->
+  <main class="flex-1 max-w-7xl mx-auto w-full p-3 md:p-4 grid lg:grid-cols-[300px_1fr_320px] gap-3 md:gap-4 overflow-hidden" style="height:calc(100vh - 56px)">
+    <!-- Left: Character + quick stats (STICKY) -->
+    <aside class="flex flex-col gap-3 md:gap-4 overflow-hidden">
+      <div class="panel p-4 sticky top-3">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-pink-200 flex items-center justify-center text-2xl">🐱</div>
+          <div class="grow">
+            <input id="charName" class="w-full bg-pink-50/50 border border-pink-200 rounded-lg px-2 py-1 text-sm" placeholder="Jouw kattennaam"/>
+            <p class="text-xs text-black/60 mt-1">Rang: <span id="rank">Kittenspion</span> · Dag <span id="day">1</span></p>
+          </div>
+        </div>
+        <div class="mt-3 space-y-2 text-xs">
+          <div>💤 Energie <span class="float-right" id="en">100%</span></div>
+          <div class="bar"><i id="enBar" style="width:100%"></i></div>
+          <div>🐶 Alert <span class="float-right" id="heat">0%</span></div>
+          <div class="bar"><i id="heatBar" style="width:0%"></i></div>
+          <div class="grid grid-cols-3 gap-2 text-center mt-2">
+            <div class="panel p-2"><div class="text-lg" id="cash">10</div><div class="text-[10px] text-black/60">🥫 Blikvoer</div></div>
+            <div class="panel p-2"><div class="text-lg" id="hp">9</div><div class="text-[10px] text-black/60">💖 Levens</div></div>
+            <div class="panel p-2"><div class="text-lg" id="rep">0</div><div class="text-[10px] text-black/60">✨ Purr</div></div>
+          </div>
+          <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+            <button id="nextDay" class="btn px-3 py-2 rounded-lg bg-pink-500 text-white">Volgende dag</button>
+            <button id="restBtn" class="btn px-3 py-2 rounded-lg bg-black/5 hover:bg-black/10">Rust</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick actions compact -->
+      <div class="panel p-3 overflow-auto">
+        <h2 class="font-semibold mb-2">Acties</h2>
+        <div class="grid grid-cols-1 gap-2 text-sm">
+          <div>
+            <p class="text-xs text-black/60 mb-1">Overvallen</p>
+            <div class="grid grid-cols-3 gap-2">
+              <button data-rob="low" class="btn px-2 py-2 rounded-lg bg-pink-200 hover:bg-pink-300">🐟</button>
+              <button data-rob="med" class="btn px-2 py-2 rounded-lg bg-pink-300 hover:bg-pink-400">🥛</button>
+              <button data-rob="high" class="btn px-2 py-2 rounded-lg bg-pink-400 hover:bg-pink-500">🛍️</button>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs text-black/60 mb-1">Werk</p>
+            <div class="grid grid-cols-3 gap-2">
+              <button data-work="odd" class="btn px-2 py-2 rounded-lg bg-[var(--mint)] hover:bg-[var(--mint)]/80">🧸</button>
+              <button data-work="security" class="btn px-2 py-2 rounded-lg bg-[var(--lav)] hover:bg-[var(--lav)]/80">🐭</button>
+              <button data-work="driver" class="btn px-2 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-600)] text-white">📦</button>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs text-black/60 mb-1">Train & Focus</p>
+            <div class="grid grid-cols-3 gap-2">
+              <button data-train="hp" class="btn px-2 py-2 rounded-lg bg-black/5 hover:bg-black/10">🪜</button>
+              <button data-train="rep" class="btn px-2 py-2 rounded-lg bg-black/5 hover:bg-black/10">👀</button>
+              <button data-train="en" class="btn px-2 py-2 rounded-lg bg-black/5 hover:bg-black/10">😴</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Middle: Log (scrollt zelfstandig) -->
+    <section class="panel p-3 md:p-4 overflow-auto">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-extrabold">Stad & Logboek</h2>
+        <div class="text-xs">v0.2</div>
+      </div>
+      <div id="log" class="space-y-1 text-sm"></div>
+    </section>
+
+    <!-- Right: Shop + Inventaris (scrollt zelfstandig) -->
+    <aside class="flex flex-col gap-3 md:gap-4 overflow-hidden">
+      <section class="panel p-3 md:p-4 overflow-auto">
+        <h3 class="font-semibold mb-2">Kattenshop</h3>
+        <ul class="text-sm space-y-2">
+          <li class="flex items-center justify-between bg-pink-50 rounded-lg px-3 py-2">
+            <span>🌿 Kattenkruid (+12 energie)</span>
+            <button data-buy="kruid" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop (3)</button>
+          </li>
+          <li class="flex items-center justify-between bg-pink-50 rounded-lg px-3 py-2">
+            <span>🔦 Laserpen (+3% overval)</span>
+            <button data-buy="laser" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop (5)</button>
+          </li>
+          <li class="flex items-center justify-between bg-pink-50 rounded-lg px-3 py-2">
+            <span>🧸 Pluche muis (+1 leven)</span>
+            <button data-buy="muis" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop (6)</button>
+          </li>
+          <li class="flex items-center justify-between bg-pink-50 rounded-lg px-3 py-2">
+            <span>💍 Halsband (−15% alert)</span>
+            <button data-buy="halsband" class="btn px-3 py-1.5 rounded-lg bg-black/5 hover:bg-black/10">Koop (8)</button>
+          </li>
+        </ul>
+      </section>
+      <section class="panel p-3 md:p-4 overflow-auto">
+        <h3 class="font-semibold mb-2">Inventaris</h3>
+        <ul class="text-sm space-y-2" id="inv"></ul>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const $=(s,r=document)=>r.querySelector(s); const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+    const SAVE_KEY='mafiacats_save_v2';
+    const state=load()||{name:'',cash:10,hp:9,en:100,rep:0,heat:0,day:1,items:{kruid:0,laser:0,muis:0,halsband:0},seed:Math.floor(Math.random()*1e9)};
+
+    // RNG
+    function rng(){ state.seed=(state.seed*1664525+1013904223)>>>0; return (state.seed>>>0)/4294967296; }
+    function clamp(n,min=0,max=100){ return Math.max(min,Math.min(max,n)); }
+
+    // UI
+    function log(t){ const d=document.createElement('div'); d.className='bg-white border border-pink-200/60 rounded px-3 py-2'; d.textContent=t; $('#log').prepend(d); }
+    function update(){
+      $('#cash').textContent=state.cash; $('#hp').textContent=state.hp; $('#en').textContent=state.en+'%'; $('#heat').textContent=state.heat+'%'; $('#rep').textContent=state.rep;
+      $('#day').textContent=state.day; $('#rank').textContent=rank(); $('#enBar').style.width=clamp(state.en)+'%'; $('#heatBar').style.width=clamp(state.heat)+'%';
+      $('#hudCash').textContent=state.cash; $('#hudHP').textContent=state.hp; $('#hudEN').textContent=state.en+'%'; $('#hudHeat').textContent=state.heat+'%'; $('#hudRep').textContent=state.rep;
+      $('#charName').value=state.name||'';
+      renderInv();
+    }
+    function rank(){ const R=[{n:'Kittenspion',r:0},{n:'Straatkat',r:30},{n:'Klapkat',r:80},{n:'Miauwster',r:150},{n:'Katerbaas',r:250},{n:'Oude wijze poes',r:400},{n:'Don Purrino',r:700}]; let cur=R[0].n; for(const r of R){ if(state.rep>=r.r) cur=r.n; else break;} return cur; }
+
+    function save(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); toast('💾 Opgeslagen'); }
+    function load(){ try{ const raw=localStorage.getItem(SAVE_KEY); return raw?JSON.parse(raw):null }catch{return null} }
+    function reset(){ localStorage.removeItem(SAVE_KEY); Object.assign(state,{name:'',cash:10,hp:9,en:100,rep:0,heat:0,day:1,items:{kruid:0,laser:0,muis:0,halsband:0}}); update(); log('🔄 Reset voltooid.'); }
+
+    // Mechanics
+    function spend(c){ if(state.en<c){ log('😴 Te moe om te miauwen.'); return false;} state.en=clamp(state.en-c); return true; }
+    function addCash(c){ state.cash=Math.max(0,state.cash+c); }
+    function addHP(h){ state.hp=Math.max(0,state.hp+h); }
+    function addRep(r){ state.rep=Math.max(0,state.rep+r); }
+    function addHeat(h){ state.heat=clamp(state.heat+h); }
+
+    function robbery(level){ const cost= level==='low'?10: level==='med'?16:22; if(!spend(cost)) return; let base= level==='low'?0.66: level==='med'?0.5:0.34; base+= state.items.laser*0.03;
+      if(rng()<base){ const payout=Math.floor((level==='low'?5: level==='med'?15:28)*(1+rng())); addCash(payout); addRep(level==='high'?7:level==='med'?4:2); addHeat(level==='high'?14:level==='med'?9:6); log(`✅ Overval geslaagd (${level}). Buit: ${payout} blikvoer.`);} else { addHP(-1-(level==='high'?1:0)); addHeat(level==='high'?20:level==='med'?12:8); log(`❌ Overval mislukt (${level}). Je werd natgespoten 💦`);} update(); check(); }
+    function work(kind){ const cost= kind==='odd'?8:12; if(!spend(cost)) return; const base= kind==='odd'?4:kind==='security'?8:10; const bonus=Math.floor(base*(0.25*rng())); addCash(base+bonus); addRep(kind==='security'?2:1); if(kind==='driver') addHeat(3); log(kind==='odd'?`💼 Knuffel‑werk: +${base+bonus} blikvoer.`: kind==='security'?`🪤 Rattenjacht: +${base+bonus} blikvoer.`:`🚚 Dozen‑mobiel: +${base+bonus} blikvoer, +alert.`); update(); }
+    function train(t){ if(!spend(8)) return; if(t==='hp'){ addHP(1); log('🪜 Je trainde: +1 leven.'); } else if(t==='rep'){ addRep(3); addHeat(1); log('👀 Onweerstaanbare blik: +3 Purr, +1 alert.'); } else { state.en=clamp(state.en+14); log('😴 Power‑nap: +14 energie.'); } update(); }
+    function rest(){ state.en=clamp(state.en+12); state.heat=clamp(state.heat-3); log('🛌 Even rust: +12 energie, −3 alert.'); update(); }
+    function nextDay(){ state.day++; state.en=clamp(state.en+25); state.heat=clamp(state.heat-5); const r=rng(); if(r<.15){ const fine=2+Math.floor(rng()*6); addCash(-fine); addHeat(3); log(`🐕 Boete: −${fine} blikvoer (+alert)`);} else if(r<.28){ const find=2+Math.floor(rng()*6); addCash(find); log(`🎁 Je vond ${find} blikvoer in een doos.`);} else if(r<.34){ addHP(-1); log('🛁 Je viel in de badkuip. −1 leven.'); } update(); check(); }
+
+    // Shop & Inventory
+    function buy(item){ const prices={kruid:3,laser:5,muis:6,halsband:8}; if(state.cash<prices[item]) return toast('Niet genoeg blikvoer'); addCash(-prices[item]); state.items[item]++; log(`🛍️ Gekocht: ${item}.`); update(); }
+    function useItem(item){ if(state.items[item]<=0) return toast('Je hebt dat item niet'); if(item==='kruid'){ state.items.kruid--; state.en=clamp(state.en+12); log('🌿 Kattenkruid: +12 energie.'); } else if(item==='muis'){ state.items.muis--; addHP(1); log('🧸 Pluche muis: +1 leven.'); } else if(item==='halsband'){ state.items.halsband--; addHeat(-15); log('💍 Halsband: −15% alert.'); } update(); }
+
+    function renderInv(){ const names={kruid:'🌿 Kattenkruid',laser:'🔦 Laserpen',muis:'🧸 Pluche muis',halsband:'💍 Halsband'}; const ul=$('#inv'); ul.innerHTML=''; Object.keys(state.items).forEach(k=>{ const li=document.createElement('li'); li.className='flex items-center justify-between bg白/70 rounded-lg px-3 py-2'.replace('白','#fff'); li.innerHTML=`<span>${names[k]} × ${state.items[k]}</span><div class='space-x-2'>${k!=='laser'?`<button data-use='${k}' class='btn px-2 py-1 rounded bg-black/5 hover:bg-black/10'>Gebruik</button>`:''}</div>`; ul.appendChild(li); }); $$('[data-use]').forEach(b=> b.addEventListener('click',()=>useItem(b.getAttribute('data-use')))); }
+
+    function check(){ if(state.hp<=0) log('🚑 Dierenambulance… GAME OVER.'); if(state.heat>=100) log('🚓 Te veel honden‑alert! GAME OVER.'); }
+
+    function toast(msg){ const t=document.createElement('div'); t.className='fixed bottom-4 left-1/2 -translate-x-1/2 bg-black/80 text-white px-3 py-2 rounded-xl text-sm'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),1400); }
+
+    // Bindings
+    $$('[data-rob]').forEach(b=> b.addEventListener('click',()=>robbery(b.getAttribute('data-rob'))));
+    $$('[data-work]').forEach(b=> b.addEventListener('click',()=>work(b.getAttribute('data-work'))));
+    $$('[data-train]').forEach(b=> b.addEventListener('click',()=>train(b.getAttribute('data-train'))));
+    $$('[data-buy]').forEach(b=> b.addEventListener('click',()=>buy(b.getAttribute('data-buy'))));
+    $('#nextDay').addEventListener('click',nextDay); $('#restBtn').addEventListener('click',rest);
+    $('#saveBtn').addEventListener('click',save); $('#resetBtn').addEventListener('click',reset);
+    $('#charName').addEventListener('input',e=>{ state.name=e.target.value; });
+
+    // Init
+    update(); if(!load()) log('Welkom! Kies acties links. Je karakterkaart blijft altijd zichtbaar. 🐾');
+  </script>
+</body>
+</html>
